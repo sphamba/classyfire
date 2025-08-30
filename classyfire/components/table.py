@@ -4,7 +4,7 @@ from .filters import filter_entries, filters_include, filters_exclude
 from ..database import columns_table, entries_table, update_database
 
 
-def get_columns_visibility():
+def get_columns_visibility() -> dict[str, bool]:
     st.subheader("🏛️ Visible columns")
 
     if "columns_visibility" not in st.session_state:
@@ -14,7 +14,7 @@ def get_columns_visibility():
 
     columns_visibility = st.session_state.columns_visibility
 
-    options = [
+    options: list[dict] = [
         {
             "label": "All",
             "button_type": "primary",
@@ -53,7 +53,7 @@ def get_columns_visibility():
         }
 
 
-def main():
+def main() -> None:
     if "table_key" not in st.session_state:
         st.session_state.table_key = 0
     if "table_row_height" not in st.session_state:
@@ -108,7 +108,7 @@ def main():
     if len(filters_include) > 0:
         st.info("Clear filters to add or remove entries.")
 
-    def discard_callback():
+    def discard_callback() -> None:
         st.session_state.table_key += 1
 
     update_database(filtered_entries, updated_entries, discard_callback=discard_callback)

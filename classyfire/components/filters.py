@@ -1,4 +1,5 @@
 import streamlit as st
+from tinydb.table import Document
 
 from ..database import columns_table, get_filters_options
 
@@ -7,7 +8,7 @@ filters_include: list[str] = []
 filters_exclude: list[str] = []
 
 
-def filter_entries(entries):
+def filter_entries(entries: list[Document]) -> list[Document]:
     for filter in filters_include:
         if ":" in filter:
             key, value = filter.split(":", 1)
@@ -33,13 +34,13 @@ def filter_entries(entries):
     return entries
 
 
-def clear_filters():
+def clear_filters() -> None:
     filters_include.clear()
     st.session_state.filters_key += 1
     st.rerun()
 
 
-def main():
+def main() -> None:
     if "filters_key" not in st.session_state:
         st.session_state.filters_key = 0
 

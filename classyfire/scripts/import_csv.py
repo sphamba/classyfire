@@ -2,14 +2,14 @@ import csv
 from classyfire.database import entries_table, columns_table
 
 
-def import_csv(csv_path):
+def import_csv(csv_path: str) -> None:
     entries_table.truncate()
 
     with open(csv_path, "r") as file:
         reader = csv.reader(file, delimiter=",", quotechar='"')
         next(reader)  # skip header
         for row in reader:
-            entry = {}
+            entry: dict[str, str | list[str]] = {}
             for i, col in enumerate(columns_table.all()):
                 if col["type"] == "tags":
                     tags = row[i].split(",")

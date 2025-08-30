@@ -1,3 +1,5 @@
+from typing import Callable
+
 import streamlit as st
 from tinydb import TinyDB
 from tinydb.table import Document
@@ -5,12 +7,12 @@ from tinydb.table import Document
 from classyfire.config import DB_PATH, DEFAULT_COLUMNS
 
 
-def init_columns():
+def init_columns() -> None:
     if len(columns_table.all()) == 0:
         columns_table.insert_multiple(DEFAULT_COLUMNS)
 
 
-def init_entries():
+def init_entries() -> None:
     if len(entries_table.all()) == 0:
         entries_table.insert_multiple([
             {
@@ -38,7 +40,7 @@ def init_entries():
         ])
 
 
-def get_filters_options():
+def get_filters_options() -> list[str]:
     options = set()
 
     for col in columns_table.all():
@@ -55,7 +57,12 @@ def get_filters_options():
     return sorted(options)
 
 
-def update_database(original_entries, updated_entries, discard_callback=None, needs_validation=True):
+def update_database(
+    original_entries: list[Document],
+    updated_entries: list[dict],
+    discard_callback: Callable | None = None,
+    needs_validation: bool = True,
+) -> None:
     if [dict(entry) for entry in original_entries] == updated_entries:
         return
 
@@ -94,7 +101,7 @@ def add_new_entry() -> Document:
     return entries_table.get(doc_id=id)
 
 
-def delete_entry(entry):
+def delete_entry(entry: Document) -> None:
     entries_table.remove(doc_ids=[entry.doc_id])
     st.rerun()
 

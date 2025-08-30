@@ -1,10 +1,11 @@
 import streamlit as st
+from tinydb.table import Document
 
 from .filters import filter_entries, clear_filters
 from ..database import columns_table, entries_table, update_database, add_new_entry, delete_entry
 
 
-def create_new_entry():
+def create_new_entry() -> None:
     new_entry = add_new_entry()
     st.session_state.single_entry_doc_index = new_entry.doc_id
     st.session_state.single_entry_index_key += 1
@@ -12,7 +13,7 @@ def create_new_entry():
     clear_filters()
 
 
-def entry_selection(entries):
+def entry_selection(entries: list[Document]) -> Document | None:
     filtered_entries = filter_entries(entries)
 
     st.subheader("👉 Entry selection")
@@ -51,7 +52,7 @@ def entry_selection(entries):
     )
 
     @st.dialog("⚠️ Confirm entry deletion")
-    def confirm_delete():
+    def confirm_delete() -> None:
         st.write("Are you sure you want to delete this entry? This action cannot be undone.")
         st.write(f"Reference: {filtered_entries[entry_index].get('reference', '_not set_') or '_not set_'}")
         st_cols = st.columns(2)
@@ -101,7 +102,7 @@ def entry_selection(entries):
     return entry
 
 
-def get_updated_entry(entry):
+def get_updated_entry(entry: Document) -> tuple[dict, bool]:
     updated_entry = dict(entry)
     needs_validation = False
 
@@ -200,7 +201,7 @@ def get_updated_entry(entry):
     return updated_entry, needs_validation
 
 
-def main():
+def main() -> None:
     if "single_key" not in st.session_state:
         st.session_state.single_key = 0
 
@@ -220,7 +221,7 @@ def main():
     if needs_validation:
         st.divider()
 
-    def discard_callback():
+    def discard_callback() -> None:
         st.session_state.single_key += 1
 
     update_database([entry], [updated_entry], discard_callback=discard_callback, needs_validation=needs_validation)

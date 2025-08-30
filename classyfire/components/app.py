@@ -5,7 +5,7 @@ from .single import main as single_component
 from .table import main as table_component
 
 
-def main():
+def main() -> None:
     st.set_page_config(
         page_title="ClassyFire",
         page_icon="🔥",

@@ -22,7 +22,7 @@ repos:
     rev: v0.12.10
     hooks:
       - id: ruff  # Linter
-        args: [ --fix ]
+        args: [ --select, "ANN0,ANN2", --fix, --unsafe-fixes ]
       - id: ruff-format  # Formatter
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
