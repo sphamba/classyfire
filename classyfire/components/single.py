@@ -23,7 +23,7 @@ def entry_selection(entries):
             create_new_entry()
         return None
 
-    st.write(f"_Showing {len(filtered_entries)} of {len(entries)} entries._")
+    st.write(f"_Listing {len(filtered_entries)} of {len(entries)} entries._")
 
     if "single_entry_doc_index" not in st.session_state:
         if "doc_id" in st.query_params:
@@ -125,16 +125,56 @@ def get_updated_entry(entry):
                 st.session_state.must_notify_single_saved = True
 
         elif col["type"] == "markdown":
+            st.write(f"#### {col['label']}")
             value = entry.get(col["key"], "") or ""
-            updated_value = st.text_area(
-                col["label"],
-                value=value,
-                height=200,
-                placeholder="Type here",
-                key=f"single_{col['key']}_{st.session_state.single_key}",
-            )
-            if value != updated_value:
-                st.session_state.must_notify_single_saved = True
+            updated_value = value
+
+            editing_key = f"editing_{col['key']}_{st.session_state.single_key}"
+            if editing_key not in st.session_state:
+                st.session_state[editing_key] = None
+
+            if st.session_state[editing_key] is not None:
+                temporary_value = st.text_area(
+                    "",
+                    value=st.session_state[editing_key],
+                    height=300,
+                    placeholder="Type Markdown here",
+                    label_visibility="collapsed",
+                    key=f"single_{col['key']}_{st.session_state.single_key}",
+                )
+
+                st_cols = st.columns(2)
+                if st_cols[0].button(
+                    "Save",
+                    type="primary",
+                    key=f"single_save_{col['key']}_{st.session_state.single_key}",
+                    use_container_width=True,
+                ):
+                    updated_value = temporary_value
+                    st.session_state[editing_key] = None
+                    if value != updated_value:
+                        st.session_state.must_notify_single_saved = True
+                    else:
+                        st.rerun()
+
+                if st_cols[1].button(
+                    "Cancel",
+                    type="secondary",
+                    key=f"single_cancel_{col['key']}_{st.session_state.single_key}",
+                    use_container_width=True,
+                ):
+                    st.session_state[editing_key] = None
+                    st.rerun()
+
+            else:
+                if value:
+                    st.markdown(value)
+                else:
+                    st.caption("_No content._")
+
+                if st.button("Edit content", type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"):
+                    st.session_state[editing_key] = value
+                    st.rerun()
 
         elif col["type"] == "tags":
             value = entry.get(col["key"], []) or []

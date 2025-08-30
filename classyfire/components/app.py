@@ -7,7 +7,7 @@ from .table import main as table_component
 
 def main():
     st.set_page_config(
-        page_title="Classy Fire 🔥",
+        page_title="ClassyFire",
         page_icon="🔥",
         layout="wide",
         menu_items={
@@ -16,7 +16,7 @@ def main():
             "About": "Classify research articles",
         },
     )
-    st.title("_cf.:_ Classy Fire🔥")
+    st.markdown("<center style='font-size:3em;font-weight:bold;'>ClassyFire🔥</center>", unsafe_allow_html=True)
 
     with st.sidebar:
         filters_component()
