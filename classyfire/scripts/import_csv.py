@@ -29,7 +29,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        print("Usage: python import_csv.py <CSV_PATH>")
+        print("Usage: python import_csv.py <path-to-csv-file>")
     csv_path = sys.argv[1]
 
     import_csv(csv_path)

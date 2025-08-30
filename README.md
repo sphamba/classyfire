@@ -32,3 +32,12 @@ make run
 ```
 
 The website will be available at [http://localhost:8501](http://localhost:8501).
+
+
+## Importing CSV data
+
+To import CSV data, run the following command:
+
+```bash
+uv run classyfire/scripts/import_csv.py <path-to-csv-file>
+```
