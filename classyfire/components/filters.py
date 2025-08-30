@@ -2,6 +2,7 @@ import streamlit as st
 from tinydb.table import Document
 
 from ..database import columns_table, get_filters_options
+from ..i18n import t
 
 
 filters_include: list[str] = []
@@ -44,25 +45,23 @@ def main() -> None:
     if "filters_key" not in st.session_state:
         st.session_state.filters_key = 0
 
-    st.header("🧩 Filters")
-    st.caption(
-        "Filter by text or tags. Use the `tag-type:tag-value` syntax to filter by specific tags (_e.g.,_ `authors:johnson`)."
-    )
+    st.header(f"🧩 {t('Filters')}")
+    st.caption(t("filters_caption"))
 
     filters_options = get_filters_options()
 
     filters_include[:] = st.multiselect(
-        "Include",
+        t("Include"),
         filters_options,
-        placeholder="Add filters",
+        placeholder=t("Add filters"),
         accept_new_options=True,
         key=f"filters_include_{st.session_state.filters_key}",
     )
 
     filters_exclude[:] = st.multiselect(
-        "Exclude",
+        t("Exclude"),
         filters_options,
-        placeholder="Add filters",
+        placeholder=t("Add filters"),
         accept_new_options=True,
         key=f"filters_exclude_{st.session_state.filters_key}",
     )
@@ -71,7 +70,7 @@ def main() -> None:
         if ":" in filter:
             key, _ = filter.split(":", 1)
             if key not in [col["key"] for col in columns_table.all()]:
-                st.warning(f'Invalid tag type "`{key}:`". Will be matched as full text.')
+                st.warning(f'{t("invalid_tag_type_1")}"`{key}:`"{t("invalid_tag_type_2")}')
 
-    if st.button("Clear filters", type="secondary", use_container_width=True):
+    if st.button(t("Clear filters"), type="secondary", use_container_width=True):
         clear_filters()

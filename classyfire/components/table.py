@@ -2,10 +2,11 @@ import streamlit as st
 
 from .filters import filter_entries, filters_include, filters_exclude
 from ..database import columns_table, entries_table, update_database
+from ..i18n import t
 
 
 def get_columns_visibility() -> dict[str, bool]:
-    st.subheader("🏛️ Visible columns")
+    st.subheader(f"🏛️ {t('Visible columns')}")
 
     if "columns_visibility" not in st.session_state:
         st.session_state.columns_visibility = {col["key"]: True for col in columns_table.all()}
@@ -16,19 +17,19 @@ def get_columns_visibility() -> dict[str, bool]:
 
     options: list[dict] = [
         {
-            "label": "All",
+            "label": t("All"),
             "button_type": "primary",
             "columns": [col["key"] for col in columns_table.all()],
             "row_height": None,
         },
         {
-            "label": "Only results",
+            "label": t("Only results"),
             "button_type": "secondary",
             "columns": ["reference", "results"],
             "row_height": 100,
         },
         {
-            "label": "Only highlights",
+            "label": t("Only highlights"),
             "button_type": "secondary",
             "columns": ["reference", "highlights"],
             "row_height": 100,
@@ -42,7 +43,7 @@ def get_columns_visibility() -> dict[str, bool]:
             st.session_state.columns_visibility_key += 1
             st.session_state.table_row_height = option["row_height"]
 
-    with st.expander("Show column toggles"):
+    with st.expander(t("Show column toggles")):
         return {
             col["key"]: st.toggle(
                 col["label"],
@@ -62,14 +63,12 @@ def main() -> None:
     columns_visibility = get_columns_visibility()
 
     st.divider()
-    st.subheader("📅 Table")
+    st.subheader(f"📅 {t('Table')}")
 
     entries = entries_table.all()
     filtered_entries = filter_entries(entries)
-    st.write(f"_Showing {len(filtered_entries)} of {len(entries)} entries._")
-    st.caption(
-        'To add a new entry, scroll to the bottom of the table, or use the "🔍 Single view" tab. To remove an entry, select its row using the leftmost column and use the trash icon that appears at the top right corner of the table.'
-    )
+    st.write(f"_{t('Showing')} {len(filtered_entries)} {t('of')} {len(entries)} {t('entries')}._")
+    st.caption(t("table_caption"))
 
     filtered_entries_with_view = []
     for entry in filtered_entries:
@@ -83,7 +82,7 @@ def main() -> None:
     column_config.update({
         "view": st.column_config.LinkColumn(
             "",
-            display_text="View",
+            display_text=t("View"),
             disabled=True,
         ),
     })
@@ -106,7 +105,7 @@ def main() -> None:
             del entry["doc_id"]
 
     if len(filters_include) > 0:
-        st.info("Clear filters to add or remove entries.")
+        st.info(t("clear_filters_info"))
 
     def discard_callback() -> None:
         st.session_state.table_key += 1

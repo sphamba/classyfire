@@ -64,25 +64,25 @@ def init_entries() -> None:
         entries_table.insert_multiple([
             {
                 "reference": "Doe et al. (2023)",
-                "theme": "Sample Theme",
-                "results": "Sample results in **markdown**.",
-                "highlights": "Sample highlights in **markdown**.",
-                "criticisms": "Sample criticisms in **markdown**.",
+                "theme": t("Sample theme"),
+                "results": t("Sample results"),
+                "highlights": t("Sample highlights"),
+                "criticisms": t("Sample criticisms"),
                 "authors": ["John Doe", "Jane Smith"],
-                "definitions": ["definition1", "definition2"],
-                "concepts": ["concept1", "concept2"],
-                "tools": ["tool1", "tool2"],
+                "definitions": [f"{t('definition')}1", f"{t('definition')}2"],
+                "concepts": [f"{t('concept')}1", f"{t('concept')}2"],
+                "tools": [f"{t('tool')}1", f"{t('tool')}2"],
             },
             {
                 "reference": "Johnson et al. (2024)",
-                "theme": "Another Theme",
-                "results": "Another set of results in **markdown**.",
-                "highlights": "Another set of highlights in **markdown**.",
-                "criticisms": "Another set of criticisms in **markdown**.",
+                "theme": t("Another theme"),
+                "results": t("Another results"),
+                "highlights": t("Another highlights"),
+                "criticisms": t("Another criticisms"),
                 "authors": ["Alice Johnson", "Bob Brown"],
-                "definitions": ["definition3", "definition4"],
-                "concepts": ["concept3", "concept4"],
-                "tools": ["tool3", "tool4"],
+                "definitions": [f"{t('definition')}3", f"{t('definition')}4"],
+                "concepts": [f"{t('concept')}3", f"{t('concept')}4"],
+                "tools": [f"{t('tool')}3", f"{t('tool')}4"],
             },
         ])
 
@@ -116,10 +116,10 @@ def update_database(
     st_cols = st.columns(3, vertical_alignment="center")
 
     with st_cols[0]:
-        st.warning("You have unsaved changes.", icon="⚠️")
+        st.warning(t("You have unsaved changes."), icon="⚠️")
 
     with st_cols[1]:
-        if st.button("Save changes", type="primary", width="stretch") or not needs_validation:
+        if st.button(t("Save changes"), type="primary", width="stretch") or not needs_validation:
             if len(original_entries) == 1 and len(updated_entries) == 1:
                 entries_table.update(updated_entries[0], doc_ids=[original_entries[0].doc_id])
                 st.rerun()
@@ -136,7 +136,7 @@ def update_database(
             st.rerun()
 
     with st_cols[2]:
-        if st.button("Discard changes", type="secondary", width="stretch"):
+        if st.button(t("Discard changes"), type="secondary", width="stretch"):
             if discard_callback:
                 discard_callback()
             st.rerun()

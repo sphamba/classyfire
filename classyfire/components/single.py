@@ -3,6 +3,7 @@ from tinydb.table import Document
 
 from .filters import filter_entries, clear_filters
 from ..database import columns_table, entries_table, update_database, add_new_entry, delete_entry
+from ..i18n import t
 
 
 def create_new_entry() -> None:
@@ -16,15 +17,15 @@ def create_new_entry() -> None:
 def entry_selection(entries: list[Document]) -> Document | None:
     filtered_entries = filter_entries(entries)
 
-    st.subheader("👉 Entry selection")
+    st.subheader(f"👉 {t('Entry selection')}")
 
     if len(filtered_entries) == 0:
-        st.info("No entries match the current filters.", icon="ℹ️")
-        if st.button("Add new entry", type="primary", use_container_width=True):
+        st.info(t("no_entries_match_info"), icon="ℹ️")
+        if st.button(t("Add new entry"), type="primary", use_container_width=True):
             create_new_entry()
         return None
 
-    st.write(f"_Listing {len(filtered_entries)} of {len(entries)} entries._")
+    st.write(f"_{t('Listing')} {len(filtered_entries)} {t('of')} {len(entries)} {t('entries')}._")
 
     if "single_entry_doc_index" not in st.session_state:
         if "doc_id" in st.query_params:
@@ -43,7 +44,7 @@ def entry_selection(entries: list[Document]) -> Document | None:
     st_cols = st.columns([0.8, 0.2])
 
     entry_index = st_cols[0].selectbox(
-        "Select an entry",
+        t("Select an entry"),
         range(len(filtered_entries)),
         index=entry_index,
         format_func=lambda i: filtered_entries[i]["reference"] or "",
@@ -51,23 +52,25 @@ def entry_selection(entries: list[Document]) -> Document | None:
         key=f"single_entry_index_{st.session_state.single_entry_index_key}",
     )
 
-    @st.dialog("⚠️ Confirm entry deletion")
+    @st.dialog(f"⚠️ {t('Confirm entry deletion')}")
     def confirm_delete() -> None:
-        st.write("Are you sure you want to delete this entry? This action cannot be undone.")
-        st.write(f"Reference: {filtered_entries[entry_index].get('reference', '_not set_') or '_not set_'}")
+        st.write(t("delete_entry_confirmation"))
+        st.write(
+            f"{t('Reference')}: {filtered_entries[entry_index].get('reference', f'_{t("not set")}_') or f'_{t("not set")}_'}"
+        )
         st_cols = st.columns(2)
-        if st_cols[0].button("Delete", type="primary", use_container_width=True):
+        if st_cols[0].button(t("Delete"), type="primary", use_container_width=True):
             delete_entry(filtered_entries[entry_index])
-        if st_cols[1].button("Cancel", type="secondary", use_container_width=True):
+        if st_cols[1].button(t("Cancel"), type="secondary", use_container_width=True):
             st.rerun()
 
-    if st_cols[1].button("Delete entry", type="tertiary", use_container_width=True):
+    if st_cols[1].button(t("Delete entry"), type="tertiary", use_container_width=True):
         confirm_delete()
 
     st_cols = st.columns([0.2, 0.6, 0.2])
 
     if st_cols[0].button(
-        "Previous",
+        t("Previous"),
         use_container_width=True,
         type="secondary",
         disabled=entry_index == 0,
@@ -78,14 +81,14 @@ def entry_selection(entries: list[Document]) -> Document | None:
         st.rerun()
 
     if st_cols[1].button(
-        "Add new entry",
+        t("Add new entry"),
         use_container_width=True,
         type="primary",
     ):
         create_new_entry()
 
     if st_cols[2].button(
-        "Next",
+        t("Next"),
         use_container_width=True,
         type="secondary",
         disabled=entry_index == len(filtered_entries) - 1,
@@ -107,7 +110,7 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
     needs_validation = False
 
     if "must_notify_single_saved" in st.session_state:
-        st.toast("Changes saved.", icon="ℹ️")
+        st.toast(t("Changes saved."), icon="ℹ️")
         del st.session_state.must_notify_single_saved
 
     for col in columns_table.all():
@@ -119,7 +122,7 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
             updated_value = st.text_input(
                 col["label"],
                 value=value,
-                placeholder="Type here",
+                placeholder=t("Type here"),
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
             if value != updated_value:
@@ -139,14 +142,14 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
                     "",
                     value=st.session_state[editing_key],
                     height=300,
-                    placeholder="Type Markdown here",
+                    placeholder=t("Type Markdown here"),
                     label_visibility="collapsed",
                     key=f"single_{col['key']}_{st.session_state.single_key}",
                 )
 
                 st_cols = st.columns(2)
                 if st_cols[0].button(
-                    "Save",
+                    t("Save"),
                     type="primary",
                     key=f"single_save_{col['key']}_{st.session_state.single_key}",
                     use_container_width=True,
@@ -159,7 +162,7 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
                         st.rerun()
 
                 if st_cols[1].button(
-                    "Cancel",
+                    t("Cancel"),
                     type="secondary",
                     key=f"single_cancel_{col['key']}_{st.session_state.single_key}",
                     use_container_width=True,
@@ -171,9 +174,11 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
                 if value:
                     st.markdown(value)
                 else:
-                    st.caption("_No content._")
+                    st.caption(f"_{t('No content.')}_")
 
-                if st.button("Edit content", type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"):
+                if st.button(
+                    t("Edit content"), type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"
+                ):
                     st.session_state[editing_key] = value
                     st.rerun()
 
@@ -189,11 +194,11 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
                 sorted(options),
                 default=value,
                 accept_new_options=True,
-                placeholder="Add tags",
+                placeholder=t("Add tags"),
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
             if value != updated_value:
-                st.info("Unsaved changes. Scroll down to validate or undo.", icon="ℹ️")
+                st.info(t("unsaved_changes_info"), icon="ℹ️")
                 needs_validation = True
 
         updated_entry[col["key"]] = updated_value
@@ -211,10 +216,10 @@ def main() -> None:
     st.divider()
 
     if entry is None:
-        st.info("No entry selected.", icon="ℹ️")
+        st.info(t("No entry selected."), icon="ℹ️")
         return
 
-    st.subheader("📝 Notes")
+    st.subheader(f"📝 {t('Notes')}")
 
     updated_entry, needs_validation = get_updated_entry(entry)
 
