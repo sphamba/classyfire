@@ -21,7 +21,7 @@ make install
 Then, edit the `.env` file in the root directory of the repository with the following content:
 
 ```env
-# TODO
+CLASSYFIRE_LANG=en  # "en" or "fr"
 ```
 
 

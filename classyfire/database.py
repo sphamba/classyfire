@@ -4,12 +4,59 @@ import streamlit as st
 from tinydb import TinyDB
 from tinydb.table import Document
 
-from classyfire.config import DB_PATH, DEFAULT_COLUMNS
+from .config import DB_PATH
+from .i18n import t
 
 
 def init_columns() -> None:
     if len(columns_table.all()) == 0:
-        columns_table.insert_multiple(DEFAULT_COLUMNS)
+        columns_table.insert_multiple([
+            {
+                "key": "reference",
+                "label": t("Reference"),
+                "type": "text",
+            },
+            {
+                "key": "theme",
+                "label": t("Theme"),
+                "type": "markdown",
+            },
+            {
+                "key": "results",
+                "label": t("Results"),
+                "type": "markdown",
+            },
+            {
+                "key": "highlights",
+                "label": t("Highlights"),
+                "type": "markdown",
+            },
+            {
+                "key": "criticisms",
+                "label": t("Criticisms"),
+                "type": "markdown",
+            },
+            {
+                "key": "authors",
+                "label": t("Authors"),
+                "type": "tags",
+            },
+            {
+                "key": "definitions",
+                "label": t("Definitions"),
+                "type": "tags",
+            },
+            {
+                "key": "concepts",
+                "label": t("Concepts"),
+                "type": "tags",
+            },
+            {
+                "key": "tools",
+                "label": t("Tools"),
+                "type": "tags",
+            },
+        ])
 
 
 def init_entries() -> None:
