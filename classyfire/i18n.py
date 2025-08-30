@@ -89,6 +89,7 @@ def t(key: str) -> str:
             "tools/tests/measurements": "Outils/Tests/Mesures",
             "view": "voir",
             "visible columns": "colonnes visibles",
+            "unsaved_changes_info": "Modifications non enregistrées. Faites défiler vers le bas pour valider ou annuler.",
             "you have unsaved changes.": "vous avez des modifications non enregistrées.",
         },
     }[LANG].get(key.lower(), key)

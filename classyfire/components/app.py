@@ -17,7 +17,10 @@ def main() -> None:
             "About": "Classify research articles",
         },
     )
-    st.markdown("<center style='font-size:3em;font-weight:bold;'>ClassyFire🔥</center>", unsafe_allow_html=True)
+    st.markdown(
+        "<center style='font-size:3em;font-weight:bold;padding-left:0.4em;'>ClassyFire🔥</center>",
+        unsafe_allow_html=True,
+    )
 
     with st.sidebar:
         filters_component()
