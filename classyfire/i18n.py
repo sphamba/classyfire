@@ -68,6 +68,7 @@ def t(key: str) -> str:
             "only highlights": "seulement points importants",
             "only results": "seulement résultats",
             "previous": "précédent",
+            "publication date": "date de publication",
             "reference": "référence",
             "results": "résultats",
             "sample criticisms": "un ensemble d'exemples de critiques en **Markdown**.",
