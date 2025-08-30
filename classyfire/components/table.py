@@ -22,8 +22,10 @@ def main():
 
     if [dict(entry) for entry in filtered_entries] != updated_entries:
         if st.button("Save changes", type="primary"):
-            entries_table.remove(doc_ids=[entry.doc_id for entry in filtered_entries])
-            entries_table.insert_multiple(updated_entries)
+            removed_ids = [entry.doc_id for entry in filtered_entries if entry not in updated_entries]
+            entries_table.remove(doc_ids=removed_ids)
+            new_entries = [entry for entry in updated_entries if entry not in filtered_entries]
+            entries_table.insert_multiple(new_entries)
             st.rerun()
 
         if st.button("Discard changes", type="secondary"):
