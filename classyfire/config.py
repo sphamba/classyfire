@@ -13,17 +13,17 @@ DEFAULT_COLUMNS = [
     {
         "key": "results",
         "label": "Results",
-        "type": "markdown",
+        "type": "text",
     },
     {
         "key": "highlights",
         "label": "Highlights",
-        "type": "markdown",
+        "type": "text",
     },
     {
         "key": "criticisms",
         "label": "Criticisms",
-        "type": "markdown",
+        "type": "text",
     },
     {
         "key": "authors",
