@@ -39,9 +39,8 @@ def get_columns_visibility():
             st.session_state.columns_visibility_key += 1
 
     with st.expander("Show column toggles"):
-        st_cols = st.columns(len(columns_table.all()))
         return {
-            col["key"]: st_cols[i].toggle(
+            col["key"]: st.toggle(
                 col["label"],
                 value=columns_visibility[col["key"]],
                 key=f"columns_visibility_{i}_{st.session_state.columns_visibility_key}",
@@ -52,6 +51,9 @@ def get_columns_visibility():
 
 def main():
     columns_visibility = get_columns_visibility()
+
+    st.write("---")
+    st.write("#### 📋 Table")
 
     entries = entries_table.all()
     filtered_entries = filter_entries(entries)

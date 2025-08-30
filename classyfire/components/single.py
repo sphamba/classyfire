@@ -57,7 +57,7 @@ def entry_selection(entries):
         if st_cols[1].button("Cancel", type="secondary", use_container_width=True):
             st.rerun()
 
-    if st_cols[1].button("Delete entry", type="primary", use_container_width=True):
+    if st_cols[1].button("Delete entry", type="tertiary", use_container_width=True):
         confirm_delete()
 
     st_cols = st.columns([0.2, 0.6, 0.2])
@@ -157,6 +157,8 @@ def get_updated_entry(entry):
 def main():
     entries = entries_table.all()
     entry = entry_selection(entries)
+
+    st.write("---")
 
     if entry is None:
         st.info("No entry selected.", icon="ℹ️")

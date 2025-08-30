@@ -21,11 +21,12 @@ def main():
     with st.sidebar:
         filters_component()
 
-    st.write("#### 👀 View mode")
     tabs = st.tabs(["🔍 Single view", "📋 Table view"])
 
     with tabs[0]:
+        st.write("")
         single_component()
 
     with tabs[1]:
+        st.write("")
         table_component()
