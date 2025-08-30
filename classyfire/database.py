@@ -94,6 +94,11 @@ def add_new_entry() -> Document:
     return entries_table.get(doc_id=id)
 
 
+def delete_entry(entry):
+    entries_table.remove(doc_ids=[entry.doc_id])
+    st.rerun()
+
+
 db = TinyDB(DB_PATH)
 columns_table = db.table("columns")
 entries_table = db.table("entries")

@@ -1,7 +1,7 @@
 import streamlit as st
 
 from .filters import filter_entries, clear_filters
-from ..database import columns_table, entries_table, update_database, add_new_entry
+from ..database import columns_table, entries_table, update_database, add_new_entry, delete_entry
 
 
 def create_new_entry():
@@ -36,7 +36,9 @@ def entry_selection(entries):
         entry_index = 0
         st.session_state.single_entry_doc_index = filtered_entries[entry_index].doc_id
 
-    entry_index = st.selectbox(
+    st_cols = st.columns([0.8, 0.2])
+
+    entry_index = st_cols[0].selectbox(
         "Select an entry",
         range(len(filtered_entries)),
         index=entry_index,
@@ -44,6 +46,19 @@ def entry_selection(entries):
         label_visibility="collapsed",
         key=f"single_entry_index_{st.session_state.single_entry_index_key}",
     )
+
+    @st.dialog("⚠️ Confirm entry deletion")
+    def confirm_delete():
+        st.write("Are you sure you want to delete this entry? This action cannot be undone.")
+        st.write(f"Reference: {filtered_entries[entry_index].get('reference', '_not set_') or '_not set_'}")
+        st_cols = st.columns(2)
+        if st_cols[0].button("Delete", type="primary", use_container_width=True):
+            delete_entry(filtered_entries[entry_index])
+        if st_cols[1].button("Cancel", type="secondary", use_container_width=True):
+            st.rerun()
+
+    if st_cols[1].button("Delete entry", type="primary", use_container_width=True):
+        confirm_delete()
 
     st_cols = st.columns([0.2, 0.6, 0.2])
 
