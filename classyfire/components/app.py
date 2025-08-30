@@ -1,6 +1,7 @@
 import streamlit as st
 
 from .filters import main as filters_component
+from .single import main as single_component
 from .table import main as table_component
 
 
@@ -15,6 +16,15 @@ def main():
             "About": "Classify research articles",
         },
     )
-    st.write("# _cf.:_ Classy Fire 🔥")
+    st.write("# _cf.:_ Classy Fire🔥")
+
     filters_component()
-    table_component()
+
+    st.write("#### 🔧 Mode")
+    tabs = st.tabs(["📋 Table view", "🔍 Single view"])
+
+    with tabs[0]:
+        table_component()
+
+    with tabs[1]:
+        single_component()

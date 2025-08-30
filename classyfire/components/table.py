@@ -1,11 +1,11 @@
 import streamlit as st
 
 from .filters import filter_entries, filters
-from ..database import columns_table, entries_table
+from ..database import columns_table, entries_table, update_database
 
 
 def get_columns_visibility():
-    st.write("#### Visible columns")
+    st.write("#### 👀 Visible columns")
 
     if "columns_visibility" not in st.session_state:
         st.session_state.columns_visibility = {col["key"]: True for col in columns_table.all()}
@@ -49,29 +49,6 @@ def get_columns_visibility():
     }
 
 
-def update_database(original_entries, updated_entries):
-    if [dict(entry) for entry in original_entries] == updated_entries:
-        return
-
-    st_cols = st.columns(3)
-
-    with st_cols[0]:
-        st.warning("You have unsaved changes.", icon="⚠️")
-
-    with st_cols[1]:
-        if st.button("Save changes", type="primary", width="stretch"):
-            removed_ids = [entry.doc_id for entry in original_entries if entry not in updated_entries]
-            entries_table.remove(doc_ids=removed_ids)
-            new_entries = [entry for entry in updated_entries if entry not in original_entries]
-            entries_table.insert_multiple(new_entries)
-            st.rerun()
-
-    with st_cols[2]:
-        if st.button("Discard changes", type="secondary", width="stretch"):
-            st.session_state.table_key += 1
-            st.rerun()
-
-
 def main():
     columns_visibility = get_columns_visibility()
 
@@ -94,4 +71,7 @@ def main():
     if len(filters) > 0:
         st.info("Clear filters to add or remove entries.")
 
-    update_database(filtered_entries, updated_entries)
+    def discard_callback():
+        st.session_state.table_key += 1
+
+    update_database(filtered_entries, updated_entries, discard_callback=discard_callback)

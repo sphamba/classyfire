@@ -22,10 +22,13 @@ def filter_entries(entries, filters):
 
 
 def main():
+    st.write("#### 🧩 Filters")
+
     filters[:] = st.multiselect(
         "Filters",
         filters_options,
         placeholder="Filter by text or tags",
+        label_visibility="collapsed",
         accept_new_options=True,
     )
 

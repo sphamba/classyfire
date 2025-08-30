@@ -1,3 +1,4 @@
+import streamlit as st
 from tinydb import TinyDB
 
 from classyfire.config import DB_PATH, DEFAULT_COLUMNS
@@ -56,6 +57,34 @@ def get_filters_options(columns_table, entries_table):
             options.update(prefixed_tags)
 
     return sorted(options)
+
+
+def update_database(original_entries, updated_entries, discard_callback=None):
+    if [dict(entry) for entry in original_entries] == updated_entries:
+        return
+
+    st_cols = st.columns(3)
+
+    with st_cols[0]:
+        st.warning("You have unsaved changes.", icon="⚠️")
+
+    with st_cols[1]:
+        if st.button("Save changes", type="primary", width="stretch"):
+            if len(original_entries) == 1 and len(updated_entries) == 1:
+                entries_table.update(updated_entries[0], doc_ids=[original_entries[0].doc_id])
+                st.rerun()
+
+            removed_ids = [entry.doc_id for entry in original_entries if entry not in updated_entries]
+            entries_table.remove(doc_ids=removed_ids)
+            new_entries = [entry for entry in updated_entries if entry not in original_entries]
+            entries_table.insert_multiple(new_entries)
+            st.rerun()
+
+    with st_cols[2]:
+        if st.button("Discard changes", type="secondary", width="stretch"):
+            if discard_callback:
+                discard_callback()
+            st.rerun()
 
 
 init_columns()

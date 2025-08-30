@@ -8,22 +8,22 @@ DEFAULT_COLUMNS = [
     {
         "key": "theme",
         "label": "Theme",
-        "type": "text",
+        "type": "markdown",
     },
     {
         "key": "results",
         "label": "Results",
-        "type": "text",
+        "type": "markdown",
     },
     {
         "key": "highlights",
         "label": "Highlights",
-        "type": "text",
+        "type": "markdown",
     },
     {
         "key": "criticisms",
         "label": "Criticisms",
-        "type": "text",
+        "type": "markdown",
     },
     {
         "key": "authors",
