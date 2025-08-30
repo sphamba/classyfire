@@ -1,4 +1,4 @@
-# _cf._: Classy Fire 🔥
+# _cf.:_ Classy Fire 🔥
 
 _Classify research articles_
 

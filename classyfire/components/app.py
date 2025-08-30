@@ -6,7 +6,7 @@ from .table import main as table_component
 
 def main():
     st.set_page_config(
-        page_title="ClassyFire",
+        page_title="Classy Fire 🔥",
         page_icon="🧐",
         layout="wide",
         menu_items={
@@ -15,6 +15,6 @@ def main():
             "About": "Classify research articles",
         },
     )
-    st.write("# ClassyFire")
+    st.write("# _cf.:_ Classy Fire 🔥")
     filters_component()
     table_component()
