@@ -46,7 +46,7 @@ def get_filters_options(columns_table, entries_table):
             continue
 
         for entry in entries_table.all():
-            tags = entry.get(col["key"], [])
+            tags = entry.get(col["key"], []) or []
             tags = [tag.lower() for tag in tags]
             prefixed_tags = [f"{col['key']}:{tag}" for tag in tags]
             options.update(tags)
@@ -60,7 +60,7 @@ def filter_entries(entries, filters):
         if ":" in filter:
             key, value = filter.split(":", 1)
             if key in [col["key"] for col in columns_table.all()]:
-                entries = [entry for entry in entries if value.lower() in [tag.lower() for tag in entry.get(key, [])]]
+                entries = [entry for entry in entries if value.lower() in [tag.lower() for tag in entry.get(key, []) or []]]
                 continue
 
         entries = [entry for entry in entries if any(filter.lower() in str(v).lower() for v in entry.values())]
@@ -68,7 +68,16 @@ def filter_entries(entries, filters):
     return entries
 
 
-st.set_page_config(layout="wide")
+st.set_page_config(
+    page_title="ClassyFire",
+    page_icon="🧐",
+    layout="wide",
+    menu_items={
+        "Get help": "https://github.com/sphamba/classyfire/issues",
+        "Report a bug": "https://github.com/sphamba/classyfire/issues",
+        "About": "Classify research articles",
+    },
+)
 st.write("# ClassyFire")
 
 filters_options = get_filters_options(columns_table, entries_table)
@@ -82,12 +91,29 @@ for filter in filters:
     if ":" in filter:
         key, value = filter.split(":", 1)
         if key not in [col["key"] for col in columns_table.all()]:
-            st.warning(f"Invalid filter key: {key}. Will be matched as full text.")
+            st.warning(f"Invalid filter key \"{key}\". Will be matched as full text.")
 
 entries = entries_table.all()
 filtered_entries = filter_entries(entries, filters)
+st.write(f"Showing {len(filtered_entries)} of {len(entries)} entries.")
+if "table_key" not in st.session_state:
+    st.session_state.table_key = 0
 updated_entries = st.data_editor(
     filtered_entries,
     column_config={ col["key"]: col["label"] for col in columns_table.all() },
-    num_rows="dynamic",
+    num_rows="dynamic" if len(filters) == 0 else "fixed",
+    key=st.session_state.table_key
 )
+
+if len(filters) > 0:
+    st.info("Clear filters to add or remove entries.")
+
+if [dict(entry) for entry in filtered_entries] != updated_entries:
+    if st.button("Save changes", type="primary"):
+        entries_table.remove(doc_ids=[entry.doc_id for entry in filtered_entries])
+        entries_table.insert_multiple(updated_entries)
+        st.rerun()
+
+    if st.button("Discard changes", type="secondary"):
+        st.session_state.table_key += 1
+        st.rerun()
