@@ -20,11 +20,11 @@ def main():
 
     filters_component()
 
-    st.write("#### 🔧 Mode")
-    tabs = st.tabs(["📋 Table view", "🔍 Single view"])
+    st.write("#### 👀 View mode")
+    tabs = st.tabs(["🔍 Single view", "📋 Table view"])
 
     with tabs[0]:
-        table_component()
+        single_component()
 
     with tabs[1]:
-        single_component()
+        table_component()

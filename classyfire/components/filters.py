@@ -21,8 +21,17 @@ def filter_entries(entries, filters):
     return entries
 
 
+def clear_filters():
+    filters.clear()
+    st.session_state.filters_key += 1
+    st.rerun()
+
+
 def main():
     st.write("#### 🧩 Filters")
+
+    if "filters_key" not in st.session_state:
+        st.session_state.filters_key = 0
 
     filters[:] = st.multiselect(
         "Filters",
@@ -30,6 +39,7 @@ def main():
         placeholder="Filter by text or tags",
         label_visibility="collapsed",
         accept_new_options=True,
+        key=f"filters_{st.session_state.filters_key}",
     )
 
     for filter in filters:

@@ -1,5 +1,6 @@
 import streamlit as st
 from tinydb import TinyDB
+from tinydb.table import Document
 
 from classyfire.config import DB_PATH, DEFAULT_COLUMNS
 
@@ -24,7 +25,7 @@ def init_entries():
                 "tools": ["tool1", "tool2"],
             },
             {
-                "reference": "Smith et al. (2024)",
+                "reference": "Johnson et al. (2024)",
                 "theme": "Another Theme",
                 "results": "Another set of results in **markdown**.",
                 "highlights": "Another set of highlights in **markdown**.",
@@ -58,7 +59,7 @@ def update_database(original_entries, updated_entries, discard_callback=None, ne
     if [dict(entry) for entry in original_entries] == updated_entries:
         return
 
-    st_cols = st.columns(3)
+    st_cols = st.columns(3, vertical_alignment="center")
 
     with st_cols[0]:
         st.warning("You have unsaved changes.", icon="⚠️")
@@ -80,6 +81,12 @@ def update_database(original_entries, updated_entries, discard_callback=None, ne
             if discard_callback:
                 discard_callback()
             st.rerun()
+
+
+def add_new_entry() -> Document:
+    new_entry = {col["key"]: None for col in columns_table.all()}
+    id = entries_table.insert(new_entry)
+    return entries_table.get(doc_id=id)
 
 
 db = TinyDB(DB_PATH)

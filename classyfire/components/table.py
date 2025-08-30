@@ -5,7 +5,7 @@ from ..database import columns_table, entries_table, update_database
 
 
 def get_columns_visibility():
-    st.write("#### 👀 Visible columns")
+    st.write("#### 📑 Visible columns")
 
     if "columns_visibility" not in st.session_state:
         st.session_state.columns_visibility = {col["key"]: True for col in columns_table.all()}
