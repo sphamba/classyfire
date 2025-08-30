@@ -40,13 +40,13 @@ def clear_filters():
 
 
 def main():
-    st.write("## 🧩 Filters")
-    st.write(
-        "Filter by text or tags. Use the `tag-type:tag-value` syntax to filter by specific tags (_e.g.,_ `authors:johnson`)."
-    )
-
     if "filters_key" not in st.session_state:
         st.session_state.filters_key = 0
+
+    st.header("🧩 Filters")
+    st.caption(
+        "Filter by text or tags. Use the `tag-type:tag-value` syntax to filter by specific tags (_e.g.,_ `authors:johnson`)."
+    )
 
     filters_options = get_filters_options()
 

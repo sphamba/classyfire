@@ -9,4 +9,4 @@ lint:
 	pre-commit run --all-files
 
 run:
-	uv run streamlit run classyfire/main.py
+	uv run streamlit run classyfire/main.py --server.headless true

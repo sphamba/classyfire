@@ -16,12 +16,12 @@ def main():
             "About": "Classify research articles",
         },
     )
-    st.write("# _cf.:_ Classy Fire🔥")
+    st.title("_cf.:_ Classy Fire🔥")
 
     with st.sidebar:
         filters_component()
 
-    tabs = st.tabs(["🔍 Single view", "📋 Table view"])
+    tabs = st.tabs(["🔍 Single view", "📅 Table view"])
 
     with tabs[0]:
         st.write("")

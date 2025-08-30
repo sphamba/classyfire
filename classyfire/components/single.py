@@ -15,7 +15,7 @@ def create_new_entry():
 def entry_selection(entries):
     filtered_entries = filter_entries(entries)
 
-    st.write("#### 🗂️ Entry selection")
+    st.subheader("👉 Entry selection")
 
     if len(filtered_entries) == 0:
         st.info("No entries match the current filters.", icon="ℹ️")
@@ -23,10 +23,13 @@ def entry_selection(entries):
             create_new_entry()
         return None
 
-    st.write(f"Showing {len(filtered_entries)} of {len(entries)} entries.")
+    st.write(f"_Showing {len(filtered_entries)} of {len(entries)} entries._")
 
     if "single_entry_doc_index" not in st.session_state:
-        st.session_state.single_entry_doc_index = filtered_entries[0].doc_id
+        if "doc_id" in st.query_params:
+            st.session_state.single_entry_doc_index = int(st.query_params["doc_id"][0])
+        else:
+            st.session_state.single_entry_doc_index = filtered_entries[0].doc_id
     if "single_entry_index_key" not in st.session_state:
         st.session_state.single_entry_index_key = 0
 
@@ -115,6 +118,7 @@ def get_updated_entry(entry):
             updated_value = st.text_input(
                 col["label"],
                 value=value,
+                placeholder="Type here",
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
             if value != updated_value:
@@ -126,6 +130,7 @@ def get_updated_entry(entry):
                 col["label"],
                 value=value,
                 height=200,
+                placeholder="Type here",
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
             if value != updated_value:
@@ -143,6 +148,7 @@ def get_updated_entry(entry):
                 sorted(options),
                 default=value,
                 accept_new_options=True,
+                placeholder="Add tags",
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
             if value != updated_value:
@@ -155,24 +161,24 @@ def get_updated_entry(entry):
 
 
 def main():
+    if "single_key" not in st.session_state:
+        st.session_state.single_key = 0
+
     entries = entries_table.all()
     entry = entry_selection(entries)
 
-    st.write("---")
+    st.divider()
 
     if entry is None:
         st.info("No entry selected.", icon="ℹ️")
         return
 
-    if "single_key" not in st.session_state:
-        st.session_state.single_key = 0
-
-    st.write("#### 📝 Notes")
+    st.subheader("📝 Notes")
 
     updated_entry, needs_validation = get_updated_entry(entry)
 
     if needs_validation:
-        st.write("---")
+        st.divider()
 
     def discard_callback():
         st.session_state.single_key += 1
