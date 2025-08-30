@@ -71,8 +71,13 @@ def update_database(original_entries, updated_entries, discard_callback=None, ne
                 st.rerun()
 
             removed_ids = [entry.doc_id for entry in original_entries if entry not in updated_entries]
-            entries_table.remove(doc_ids=removed_ids)
             new_entries = [entry for entry in updated_entries if entry not in original_entries]
+
+            if len(removed_ids) == 1 and len(new_entries) == 1:
+                entries_table.update(new_entries[0], doc_ids=[removed_ids[0]])
+                st.rerun()
+
+            entries_table.remove(doc_ids=removed_ids)
             entries_table.insert_multiple(new_entries)
             st.rerun()
 

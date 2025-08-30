@@ -4,28 +4,42 @@ from .filters import filter_entries, clear_filters
 from ..database import columns_table, entries_table, update_database, add_new_entry
 
 
+def create_new_entry():
+    new_entry = add_new_entry()
+    st.session_state.single_entry_doc_index = new_entry.doc_id
+    st.session_state.single_entry_index_key += 1
+    st.session_state.single_key += 1
+    clear_filters()
+
+
 def entry_selection(entries):
     filtered_entries = filter_entries(entries)
 
     st.write("#### 🗂️ Entry selection")
+
     if len(filtered_entries) == 0:
         st.info("No entries match the current filters.", icon="ℹ️")
+        if st.button("Add new entry", type="primary", use_container_width=True):
+            create_new_entry()
         return None
+
     st.write(f"Showing {len(filtered_entries)} of {len(entries)} entries.")
 
-    if (
-        "single_entry_index" not in st.session_state
-        or st.session_state.single_entry_index < 0
-        or st.session_state.single_entry_index >= len(filtered_entries)
-    ):
-        st.session_state.single_entry_index = 0
+    if "single_entry_doc_index" not in st.session_state:
+        st.session_state.single_entry_doc_index = filtered_entries[0].doc_id
     if "single_entry_index_key" not in st.session_state:
         st.session_state.single_entry_index_key = 0
+
+    try:
+        entry_index = [entry.doc_id for entry in filtered_entries].index(st.session_state.single_entry_doc_index)
+    except ValueError:
+        entry_index = 0
+        st.session_state.single_entry_doc_index = filtered_entries[entry_index].doc_id
 
     entry_index = st.selectbox(
         "Select an entry",
         range(len(filtered_entries)),
-        index=st.session_state.single_entry_index,
+        index=entry_index,
         format_func=lambda i: filtered_entries[i]["reference"] or "",
         label_visibility="collapsed",
         key=f"single_entry_index_{st.session_state.single_entry_index_key}",
@@ -39,7 +53,7 @@ def entry_selection(entries):
         type="secondary",
         disabled=entry_index == 0,
     ):
-        st.session_state.single_entry_index = entry_index - 1
+        st.session_state.single_entry_doc_index = filtered_entries[entry_index - 1].doc_id
         st.session_state.single_entry_index_key += 1
         st.session_state.single_key += 1
         st.rerun()
@@ -49,14 +63,7 @@ def entry_selection(entries):
         use_container_width=True,
         type="primary",
     ):
-        new_entry = add_new_entry()
-        if new_entry in entries_table.all():
-            st.session_state.single_entry_index = entries_table.all().index(new_entry)
-        else:
-            st.session_state.single_entry_index = len(entries_table.all()) - 1
-        st.session_state.single_entry_index_key += 1
-        st.session_state.single_key += 1
-        clear_filters()
+        create_new_entry()
 
     if st_cols[2].button(
         "Next",
@@ -64,7 +71,7 @@ def entry_selection(entries):
         type="secondary",
         disabled=entry_index == len(filtered_entries) - 1,
     ):
-        st.session_state.single_entry_index = entry_index + 1
+        st.session_state.single_entry_doc_index = filtered_entries[entry_index + 1].doc_id
         st.session_state.single_entry_index_key += 1
         st.session_state.single_key += 1
         st.rerun()
