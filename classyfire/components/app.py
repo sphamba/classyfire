@@ -18,7 +18,8 @@ def main():
     )
     st.write("# _cf.:_ Classy Fire🔥")
 
-    filters_component()
+    with st.sidebar:
+        filters_component()
 
     st.write("#### 👀 View mode")
     tabs = st.tabs(["🔍 Single view", "📋 Table view"])
