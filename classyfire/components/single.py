@@ -2,6 +2,7 @@ import streamlit as st
 from tinydb.table import Document
 
 from .filters import filter_entries, clear_filters
+from .sort import sort_entries
 from ..database import columns_table, entries_table, update_database, add_new_entry, delete_entry
 from ..i18n import t
 
@@ -15,7 +16,7 @@ def create_new_entry() -> None:
 
 
 def entry_selection(entries: list[Document]) -> Document | None:
-    filtered_entries = filter_entries(entries)
+    filtered_entries = sort_entries(filter_entries(entries))
 
     st.subheader(f"👉 {t('Entry selection')}")
 

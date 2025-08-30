@@ -2,6 +2,7 @@ import streamlit as st
 
 from .filters import main as filters_component
 from .single import main as single_component
+from .sort import main as sort_component
 from .table import main as table_component
 from ..i18n import t
 
@@ -24,6 +25,8 @@ def main() -> None:
 
     with st.sidebar:
         filters_component()
+        st.divider()
+        sort_component()
 
     tabs = st.tabs([f"🔍 {t('Single view')}", f"📅 {t('Table view')}"])
 

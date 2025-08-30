@@ -1,6 +1,7 @@
 import streamlit as st
 
 from .filters import filter_entries, filters_include, filters_exclude
+from .sort import sort_entries
 from ..database import columns_table, entries_table, update_database
 from ..i18n import t
 
@@ -66,7 +67,7 @@ def main() -> None:
     st.subheader(f"📅 {t('Table')}")
 
     entries = entries_table.all()
-    filtered_entries = filter_entries(entries)
+    filtered_entries = sort_entries(filter_entries(entries))
     st.write(f"_{t('Showing')} {len(filtered_entries)} {t('of')} {len(entries)} {t('entries')}._")
     st.caption(t("table_caption"))
 
