@@ -1,6 +1,6 @@
 import streamlit as st
 
-from .filters import filter_entries, filters
+from .filters import filter_entries, filters_include, filters_exclude
 from ..database import columns_table, entries_table, update_database
 
 
@@ -23,12 +23,12 @@ def get_columns_visibility():
         {
             "label": "Only results",
             "button_type": "secondary",
-            "columns": ["reference", "theme", "results"],
+            "columns": ["reference", "results"],
         },
         {
             "label": "Only highlights",
             "button_type": "secondary",
-            "columns": ["reference", "theme", "highlights"],
+            "columns": ["reference", "highlights"],
         },
     ]
     st_cols = st.columns(len(options))
@@ -54,7 +54,7 @@ def main():
     columns_visibility = get_columns_visibility()
 
     entries = entries_table.all()
-    filtered_entries = filter_entries(entries, filters)
+    filtered_entries = filter_entries(entries)
     st.write(f"Showing {len(filtered_entries)} of {len(entries)} entries.")
 
     if "table_key" not in st.session_state:
@@ -65,11 +65,11 @@ def main():
         column_config={
             col["key"]: col["label"] if columns_visibility[col["key"]] else None for col in columns_table.all()
         },
-        num_rows="dynamic" if len(filters) == 0 else "fixed",
+        num_rows="dynamic" if len(filters_include) == 0 and len(filters_exclude) == 0 else "fixed",
         key=f"table_{st.session_state.table_key}",
     )
 
-    if len(filters) > 0:
+    if len(filters_include) > 0:
         st.info("Clear filters to add or remove entries.")
 
     def discard_callback():

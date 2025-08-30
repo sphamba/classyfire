@@ -8,7 +8,7 @@ from .table import main as table_component
 def main():
     st.set_page_config(
         page_title="Classy Fire 🔥",
-        page_icon="🧐",
+        page_icon="🔥",
         layout="wide",
         menu_items={
             "Get help": "https://github.com/sphamba/classyfire/issues",

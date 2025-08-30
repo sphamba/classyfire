@@ -38,7 +38,7 @@ def init_entries():
         ])
 
 
-def get_filters_options(columns_table, entries_table):
+def get_filters_options():
     options = set()
 
     for col in columns_table.all():
@@ -94,4 +94,3 @@ columns_table = db.table("columns")
 entries_table = db.table("entries")
 init_columns()
 init_entries()
-filters_options = get_filters_options(columns_table, entries_table)

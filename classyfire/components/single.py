@@ -1,16 +1,23 @@
 import streamlit as st
 
-from .filters import filter_entries, filters, clear_filters
+from .filters import filter_entries, clear_filters
 from ..database import columns_table, entries_table, update_database, add_new_entry
 
 
 def entry_selection(entries):
-    filtered_entries = filter_entries(entries, filters)
+    filtered_entries = filter_entries(entries)
 
     st.write("#### 🗂️ Entry selection")
+    if len(filtered_entries) == 0:
+        st.info("No entries match the current filters.", icon="ℹ️")
+        return None
     st.write(f"Showing {len(filtered_entries)} of {len(entries)} entries.")
 
-    if "single_entry_index" not in st.session_state:
+    if (
+        "single_entry_index" not in st.session_state
+        or st.session_state.single_entry_index < 0
+        or st.session_state.single_entry_index >= len(filtered_entries)
+    ):
         st.session_state.single_entry_index = 0
     if "single_entry_index_key" not in st.session_state:
         st.session_state.single_entry_index_key = 0
@@ -34,6 +41,7 @@ def entry_selection(entries):
     ):
         st.session_state.single_entry_index = entry_index - 1
         st.session_state.single_entry_index_key += 1
+        st.session_state.single_key += 1
         st.rerun()
 
     if st_cols[1].button(
@@ -47,6 +55,7 @@ def entry_selection(entries):
         else:
             st.session_state.single_entry_index = len(entries_table.all()) - 1
         st.session_state.single_entry_index_key += 1
+        st.session_state.single_key += 1
         clear_filters()
 
     if st_cols[2].button(
@@ -57,8 +66,11 @@ def entry_selection(entries):
     ):
         st.session_state.single_entry_index = entry_index + 1
         st.session_state.single_entry_index_key += 1
+        st.session_state.single_key += 1
         st.rerun()
 
+    if entry_index is None or entry_index < 0 or entry_index >= len(filtered_entries):
+        return None
     entry = filtered_entries[entry_index]
 
     return entry
@@ -101,12 +113,12 @@ def get_updated_entry(entry):
             value = entry.get(col["key"], []) or []
 
             options = set(value)
-            for entry in entries_table.all():
-                options = options.union(entry.get(col["key"], []) or [])
+            for _entry in entries_table.all():
+                options = options.union(_entry.get(col["key"], []) or [])
 
             updated_value = st.multiselect(
                 col["label"],
-                options,
+                sorted(options),
                 default=value,
                 accept_new_options=True,
                 key=f"single_{col['key']}_{st.session_state.single_key}",
@@ -123,6 +135,10 @@ def get_updated_entry(entry):
 def main():
     entries = entries_table.all()
     entry = entry_selection(entries)
+
+    if entry is None:
+        st.info("No entry selected.", icon="ℹ️")
+        return
 
     if "single_key" not in st.session_state:
         st.session_state.single_key = 0
