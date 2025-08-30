@@ -99,9 +99,14 @@ def get_updated_entry(entry):
 
         elif col["type"] == "tags":
             value = entry.get(col["key"], []) or []
+
+            options = set(value)
+            for entry in entries_table.all():
+                options = options.union(entry.get(col["key"], []) or [])
+
             updated_value = st.multiselect(
                 col["label"],
-                value,
+                options,
                 default=value,
                 accept_new_options=True,
                 key=f"single_{col['key']}_{st.session_state.single_key}",
