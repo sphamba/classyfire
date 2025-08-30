@@ -9,6 +9,7 @@ def main():
     filtered_entries = filter_entries(entries, filters)
 
     st.write("#### 🗂️ Entry selection")
+    st.write(f"Showing {len(filtered_entries)} of {len(entries)} entries.")
     entry_index = st.selectbox(
         "Select an entry",
         range(len(filtered_entries)),
@@ -22,33 +23,55 @@ def main():
         st.session_state.single_key = 0
 
     st.write("#### 📝 Notes")
+    needs_validation = False
+
+    if "must_notify_single_saved" in st.session_state:
+        st.toast("Changes saved.", icon="ℹ️")
+        del st.session_state.must_notify_single_saved
+
     for col in columns_table.all():
+        value = None
+        updated_value = None
+
         if col["type"] == "text":
-            updated_entry[col["key"]] = st.text_input(
+            value = entry.get(col["key"], "")
+            updated_value = st.text_input(
                 col["label"],
-                value=entry.get(col["key"], ""),
+                value=value,
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
+            if value != updated_value:
+                st.session_state.must_notify_single_saved = True
 
         elif col["type"] == "markdown":
-            updated_entry[col["key"]] = st.text_area(
+            value = entry.get(col["key"], "")
+            updated_value = st.text_area(
                 col["label"],
                 value=entry.get(col["key"], ""),
                 height=200,
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
+            if value != updated_value:
+                st.session_state.must_notify_single_saved = True
 
         elif col["type"] == "tags":
-            options = entry.get(col["key"], []) or []
-            updated_entry[col["key"]] = st.multiselect(
+            value = entry.get(col["key"], []) or []
+            updated_value = st.multiselect(
                 col["label"],
-                options,
-                default=options,
+                value,
+                default=value,
                 accept_new_options=True,
                 key=f"single_{col['key']}_{st.session_state.single_key}",
             )
+            if value != updated_value:
+                st.info("Unsaved changes. Scroll down to validate or undo.", icon="ℹ️")
+                needs_validation = True
+
+        updated_entry[col["key"]] = updated_value
+
+    st.write("---")
 
     def discard_callback():
         st.session_state.single_key += 1
 
-    update_database([entry], [updated_entry], discard_callback=discard_callback)
+    update_database([entry], [updated_entry], discard_callback=discard_callback, needs_validation=needs_validation)

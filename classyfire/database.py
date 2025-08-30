@@ -4,11 +4,6 @@ from tinydb import TinyDB
 from classyfire.config import DB_PATH, DEFAULT_COLUMNS
 
 
-db = TinyDB(DB_PATH)
-columns_table = db.table("columns")
-entries_table = db.table("entries")
-
-
 def init_columns():
     if len(columns_table.all()) == 0:
         columns_table.insert_multiple(DEFAULT_COLUMNS)
@@ -59,7 +54,7 @@ def get_filters_options(columns_table, entries_table):
     return sorted(options)
 
 
-def update_database(original_entries, updated_entries, discard_callback=None):
+def update_database(original_entries, updated_entries, discard_callback=None, needs_validation=True):
     if [dict(entry) for entry in original_entries] == updated_entries:
         return
 
@@ -69,7 +64,7 @@ def update_database(original_entries, updated_entries, discard_callback=None):
         st.warning("You have unsaved changes.", icon="⚠️")
 
     with st_cols[1]:
-        if st.button("Save changes", type="primary", width="stretch"):
+        if st.button("Save changes", type="primary", width="stretch") or not needs_validation:
             if len(original_entries) == 1 and len(updated_entries) == 1:
                 entries_table.update(updated_entries[0], doc_ids=[original_entries[0].doc_id])
                 st.rerun()
@@ -87,6 +82,9 @@ def update_database(original_entries, updated_entries, discard_callback=None):
             st.rerun()
 
 
+db = TinyDB(DB_PATH)
+columns_table = db.table("columns")
+entries_table = db.table("entries")
 init_columns()
 init_entries()
 filters_options = get_filters_options(columns_table, entries_table)
