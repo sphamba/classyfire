@@ -42,9 +42,9 @@ def entry_selection(entries):
         type="primary",
     ):
         new_entry = add_new_entry()
-        try:
+        if new_entry in entries_table.all():
             st.session_state.single_entry_index = entries_table.all().index(new_entry)
-        except IndexError:
+        else:
             st.session_state.single_entry_index = len(entries_table.all()) - 1
         st.session_state.single_entry_index_key += 1
         clear_filters()
