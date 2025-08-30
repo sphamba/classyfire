@@ -8,7 +8,7 @@ def get_columns_visibility():
     st.write("#### Visible columns")
 
     if "columns_visibility" not in st.session_state:
-        st.session_state.columns_visibility = { col["key"]: True for col in columns_table.all() }
+        st.session_state.columns_visibility = {col["key"]: True for col in columns_table.all()}
     if "columns_visibility_key" not in st.session_state:
         st.session_state.columns_visibility_key = 0
 
@@ -34,12 +34,19 @@ def get_columns_visibility():
     st_cols = st.columns(len(options))
     for i, option in enumerate(options):
         if st_cols[i].button(option["label"], type=option["button_type"], use_container_width=True):
-            columns_visibility = { col["key"]: col["key"] in option["columns"] for col in columns_table.all() }
+            columns_visibility = {col["key"]: col["key"] in option["columns"] for col in columns_table.all()}
             st.session_state.columns_visibility = columns_visibility
             st.session_state.columns_visibility_key += 1
 
     st_cols = st.columns(len(columns_table.all()))
-    return { col["key"]: st_cols[i].toggle(col["label"], value=columns_visibility[col["key"]], key=f"columns_visibility_{i}_{st.session_state.columns_visibility_key}") for i, col in enumerate(columns_table.all()) }
+    return {
+        col["key"]: st_cols[i].toggle(
+            col["label"],
+            value=columns_visibility[col["key"]],
+            key=f"columns_visibility_{i}_{st.session_state.columns_visibility_key}",
+        )
+        for i, col in enumerate(columns_table.all())
+    }
 
 
 def update_database(original_entries, updated_entries):
@@ -77,7 +84,9 @@ def main():
 
     updated_entries = st.data_editor(
         filtered_entries,
-        column_config={ col["key"]: col["label"] if columns_visibility[col["key"]] else None for col in columns_table.all() },
+        column_config={
+            col["key"]: col["label"] if columns_visibility[col["key"]] else None for col in columns_table.all()
+        },
         num_rows="dynamic" if len(filters) == 0 else "fixed",
         key=f"table_{st.session_state.table_key}",
     )

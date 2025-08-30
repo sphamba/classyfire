@@ -1,4 +1,4 @@
-from tinydb import TinyDB, Query
+from tinydb import TinyDB
 
 from classyfire.config import DB_PATH, DEFAULT_COLUMNS
 
