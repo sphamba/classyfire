@@ -110,10 +110,28 @@ def update_database(
     discard_callback: Callable | None = None,
     needs_validation: bool = True,
 ) -> None:
-    if [dict(entry) for entry in original_entries] == updated_entries:
-        return
+    unsaved_changes = [dict(entry) for entry in original_entries] != updated_entries
+    st_cols = st.columns([0.5, 0.25, 0.25], vertical_alignment="center")
 
-    st_cols = st.columns(3, vertical_alignment="center")
+    if not unsaved_changes:
+        if "disabled_save_buttons_key" not in st.session_state:
+            st.session_state.disabled_save_buttons_key = 0
+        st_cols[1].button(
+            t("Save changes"),
+            type="primary",
+            width="stretch",
+            disabled=True,
+            key=f"table_save_button_disabled_{st.session_state.disabled_save_buttons_key}",
+        )
+        st_cols[2].button(
+            t("Discard changes"),
+            type="secondary",
+            width="stretch",
+            disabled=True,
+            key=f"table_discard_button_disabled_{st.session_state.disabled_save_buttons_key}",
+        )
+        st.session_state.disabled_save_buttons_key += 1
+        return
 
     with st_cols[0]:
         st.warning(t("You have unsaved changes."), icon="⚠️")

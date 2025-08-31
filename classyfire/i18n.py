@@ -19,8 +19,9 @@ def t(key: str) -> str:
             "sample results": "sample results in **Markdown**.",
             "sample theme": "sample theme",
             "sort_caption": "Sort the entries in the entry selection list (Single view) and in the table (Table view).",
-            "table_caption": 'To add a new entry, scroll to the bottom of the table, or use the "🔍 Single view" tab. To remove an entry, select its row using the leftmost column and use the trash icon that appears at the top right corner of the table.',
-            "unsaved_changes_info": "Unsaved changes. Scroll down to validate or undo.",
+            "table_caption": "Information can be edited directly in the table. Changes must then be saved manually (buttons below the table). To remove an entry, select its row using the leftmost column and use the trash icon that appears at the top right corner of the table.",
+            "unsaved_changes_info": "Unsaved changes. Use the buttons at the bottom of the page to confirm or discard.",
+            "you have unsaved changes.": "you have unsaved changes. Changing filters or sorting will discard your changes.",
         },
         "fr": {
             "add filters": "ajouter des filtres",
@@ -81,7 +82,7 @@ def t(key: str) -> str:
             "showing": "affichage de",
             "sort": "tri",
             "table": "tableau",
-            "table_caption": "Pour ajouter un nouvel article, défilez jusqu'en bas du tableau, ou utilisez l'onglet \"🔍 Vue unique\". Pour supprimer un article, sélectionnez sa ligne en utilisant la colonne la plus à gauche et utilisez l'icône poubelle qui apparaît dans le coin supérieur droit du tableau.",
+            "table_caption": "Les informations peuvent être modifiées directement dans le tableau. Les modifications doivent ensuite être sauvegardées manuellement (buttons en dessous du tableau). Pour supprimer un article, sélectionnez sa ligne en utilisant la colonne la plus à gauche et utilisez l'icône poubelle qui apparaît dans le coin supérieur droit du tableau.",
             "theme": "thème",
             "type here": "tapez ici",
             "type markdown here": "tapez du Markdown ici",
@@ -96,8 +97,8 @@ def t(key: str) -> str:
             "tools/tests/measurements": "Outils/Tests/Mesures",
             "view": "voir",
             "visible columns": "colonnes visibles",
-            "unsaved_changes_info": "Modifications non enregistrées. Faites défiler vers le bas pour valider ou annuler.",
-            "you have unsaved changes.": "vous avez des modifications non enregistrées.",
+            "unsaved_changes_info": "Modifications non enregistrées. Utilisez les boutons en bas de la page pour valider ou annuler.",
+            "you have unsaved changes.": "vous avez des modifications non enregistrées. Changer les filtres ou le tri annulera vos modifications.",
         },
     }[LANG].get(key.lower(), key)
 

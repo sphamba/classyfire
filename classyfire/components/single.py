@@ -224,8 +224,7 @@ def main() -> None:
 
     updated_entry, needs_validation = get_updated_entry(entry)
 
-    if needs_validation:
-        st.divider()
+    st.divider()
 
     def discard_callback() -> None:
         st.session_state.single_key += 1
