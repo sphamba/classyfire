@@ -2,7 +2,7 @@
 
 _Quickly annotate, tag, and browse your collection of research articles._
 
-Made with Python and [Streamlit](https://streamlit.io/).
+Made with Python and [Streamlit](https://streamlit.io/). Try the [Live Demo](https://classyfire.streamlit.app/)!
 
 ## Features
 
