@@ -3,4 +3,6 @@
 __pycache__
 .python-version
 .venv
+classyfire.service
 db.json
+backups
