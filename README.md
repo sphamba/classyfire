@@ -1,7 +1,18 @@
 # ClassyFire 🔥
 
-_Classify research articles_
+_Quickly annotate, tag, and browse your collection of research articles._
 
+Made with Python and [Streamlit](https://streamlit.io/).
+
+## Features
+
+- Online access on desktop and mobile
+- Markdown annotations
+- Tags with categories and associated pages
+- Filtering
+
+<img width="400" alt="Annotations and tags" src="https://github.com/user-attachments/assets/6c3fcbc2-9b1e-4825-a309-839729d83269" />
+<img alt="Dynamic table" src="https://github.com/user-attachments/assets/f7fbe037-a516-4be5-a1bd-909ba858a415" />
 
 ## Requirements
 
