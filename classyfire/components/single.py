@@ -1,3 +1,5 @@
+import re
+
 import streamlit as st
 from tinydb.table import Document
 
@@ -236,6 +238,38 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
     return updated_entry, needs_validation
 
 
+def write_pages_summary(entry: dict) -> None:
+    pages_info: dict[str, list[str]] = {}
+
+    for col in columns_table.all():
+        if col["type"] != "tags":
+            continue
+
+        for tag in entry.get(col["key"], []) or []:
+            if ":" not in tag:
+                continue
+
+            value, pages = tag.split(":", 1)
+            if pages not in pages_info:
+                pages_info[pages] = []
+            pages_info[pages].append(f":blue-badge[{t(col['key'])}|{value}]")
+
+    if len(pages_info) == 0:
+        return
+
+    def sort_key(pages: str) -> int | float:
+        match = re.search(r"\d+", pages)
+        if match:
+            return int(match.group())
+        return float("inf")
+
+    pages_list = sorted(pages_info.keys(), key=sort_key)
+    pages_info_list = [f"- {pages}: {''.join(pages_info[pages])}" for pages in pages_list]
+
+    st.markdown("#### 📑 " + t("Pages summary"))
+    st.markdown("\n".join(pages_info_list))
+
+
 def main() -> None:
     if "single_key" not in st.session_state:
         st.session_state.single_key = 0
@@ -252,6 +286,7 @@ def main() -> None:
     st.subheader(f"📝 {t('Notes')}")
 
     updated_entry, needs_validation = get_updated_entry(entry)
+    write_pages_summary(updated_entry)
 
     st.divider()
 

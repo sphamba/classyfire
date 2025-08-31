@@ -53,7 +53,7 @@ def init_columns() -> None:
             },
             {
                 "key": "tools",
-                "label": t("Tools"),
+                "label": t("Tools/Tests/Measurements"),
                 "type": "tags",
             },
         ])
@@ -69,9 +69,9 @@ def init_entries() -> None:
                 "highlights": t("Sample highlights"),
                 "criticisms": t("Sample criticisms"),
                 "authors": ["John Doe", "Jane Smith"],
-                "definitions": [f"{t('definition')}1:42", f"{t('definition')}2"],
-                "concepts": [f"{t('concept')}1", f"{t('concept')}2"],
-                "tools": [f"{t('tool')}1", f"{t('tool')}2"],
+                "definitions": [f"{t('definition')}1:p.42", f"{t('definition')}2"],
+                "concepts": [f"{t('concept')}1:p.3", f"{t('concept')}2"],
+                "tools": [f"{t('tool')}1", f"{t('tool')}2:p.3"],
             },
             {
                 "reference": "Johnson et al., 2024",
@@ -80,8 +80,8 @@ def init_entries() -> None:
                 "highlights": t("Another highlights"),
                 "criticisms": t("Another criticisms"),
                 "authors": ["Alice Johnson", "Bob Brown"],
-                "definitions": [f"{t('definition')}3", f"{t('definition')}4"],
-                "concepts": [f"{t('concept')}3", f"{t('concept')}4:29-31"],
+                "definitions": [f"{t('definition')}3", f"{t('definition')}4:p.5"],
+                "concepts": [f"{t('concept')}3", f"{t('concept')}4:pp.29-31"],
                 "tools": [f"{t('tool')}3", f"{t('tool')}4"],
             },
         ])
