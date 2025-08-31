@@ -106,6 +106,112 @@ def entry_selection(entries: list[Document]) -> Document | None:
     return entry
 
 
+def get_entry_with_updated_text(entry: dict, col: dict) -> dict:
+    if col["type"] == "tags":
+        return entry
+
+    updated_entry = entry.copy()
+    value = ""
+    updated_value = ""
+
+    if col["type"] == "text":
+        value = entry.get(col["key"], "") or ""
+        updated_value = st.text_input(
+            col["label"],
+            value=value,
+            placeholder=t("Type here"),
+            key=f"single_{col['key']}_{st.session_state.single_key}",
+        )
+        if value != updated_value:
+            st.session_state.must_notify_single_saved = True
+
+    elif col["type"] == "markdown":
+        st.write(f"#### {col['label']}")
+        value = entry.get(col["key"], "") or ""
+        updated_value = value
+
+        editing_key = f"editing_{col['key']}_{st.session_state.single_key}"
+        if editing_key not in st.session_state:
+            st.session_state[editing_key] = None
+
+        if st.session_state[editing_key] is not None:
+            temporary_value = st.text_area(
+                "",
+                value=st.session_state[editing_key],
+                height=300,
+                placeholder=t("Type Markdown here"),
+                label_visibility="collapsed",
+                key=f"single_{col['key']}_{st.session_state.single_key}",
+            )
+
+            st_cols = st.columns(2)
+            if st_cols[0].button(
+                t("Save"),
+                type="primary",
+                key=f"single_save_{col['key']}_{st.session_state.single_key}",
+                use_container_width=True,
+            ):
+                updated_value = temporary_value
+                st.session_state[editing_key] = None
+                if value != updated_value:
+                    st.session_state.must_notify_single_saved = True
+                else:
+                    st.rerun()
+
+            if st_cols[1].button(
+                t("Cancel"),
+                type="secondary",
+                key=f"single_cancel_{col['key']}_{st.session_state.single_key}",
+                use_container_width=True,
+            ):
+                st.session_state[editing_key] = None
+                st.rerun()
+
+        else:
+            if value:
+                st.markdown(value)
+            else:
+                st.caption(f"_{t('No content.')}_")
+
+            if st.button(t("Edit content"), type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"):
+                st.session_state[editing_key] = value
+                st.rerun()
+
+    updated_entry[col["key"]] = updated_value
+    return updated_entry
+
+
+def get_entry_with_updated_tags(entry: dict, col: dict) -> tuple[dict, bool]:
+    if col["type"] != "tags":
+        return entry, False
+
+    updated_entry = entry.copy()
+    needs_validation = False
+    value = entry.get(col["key"], []) or []
+
+    options = set(value)
+    for _entry in entries_table.all():
+        options = options.union([tag.split(":")[0] for tag in (_entry.get(col["key"], []) or [])])
+
+    for tag in value:
+        if ":" in tag:
+            options.remove(tag.split(":")[0])
+
+    updated_value = st.multiselect(
+        col["label"],
+        sorted(options),
+        default=value,
+        accept_new_options=True,
+        placeholder=t("Add tags"),
+        key=f"single_{col['key']}_{st.session_state.single_key}",
+    )
+    if value != updated_value:
+        needs_validation = True
+
+    updated_entry[col["key"]] = updated_value
+    return updated_entry, needs_validation
+
+
 def get_updated_entry(entry: Document) -> tuple[dict, bool]:
     updated_entry = dict(entry)
     needs_validation = False
@@ -115,94 +221,17 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
         del st.session_state.must_notify_single_saved
 
     for col in columns_table.all():
-        value = None
-        updated_value = None
+        updated_entry = get_entry_with_updated_text(updated_entry, col)
 
-        if col["type"] == "text":
-            value = entry.get(col["key"], "") or ""
-            updated_value = st.text_input(
-                col["label"],
-                value=value,
-                placeholder=t("Type here"),
-                key=f"single_{col['key']}_{st.session_state.single_key}",
-            )
-            if value != updated_value:
-                st.session_state.must_notify_single_saved = True
+    st.write(f"#### 🏷️ {t('Tags')}")
+    st.caption(t("tag_format_caption"))
 
-        elif col["type"] == "markdown":
-            st.write(f"#### {col['label']}")
-            value = entry.get(col["key"], "") or ""
-            updated_value = value
+    for col in columns_table.all():
+        updated_entry, col_needs_validation = get_entry_with_updated_tags(updated_entry, col)
+        needs_validation = needs_validation or col_needs_validation
 
-            editing_key = f"editing_{col['key']}_{st.session_state.single_key}"
-            if editing_key not in st.session_state:
-                st.session_state[editing_key] = None
-
-            if st.session_state[editing_key] is not None:
-                temporary_value = st.text_area(
-                    "",
-                    value=st.session_state[editing_key],
-                    height=300,
-                    placeholder=t("Type Markdown here"),
-                    label_visibility="collapsed",
-                    key=f"single_{col['key']}_{st.session_state.single_key}",
-                )
-
-                st_cols = st.columns(2)
-                if st_cols[0].button(
-                    t("Save"),
-                    type="primary",
-                    key=f"single_save_{col['key']}_{st.session_state.single_key}",
-                    use_container_width=True,
-                ):
-                    updated_value = temporary_value
-                    st.session_state[editing_key] = None
-                    if value != updated_value:
-                        st.session_state.must_notify_single_saved = True
-                    else:
-                        st.rerun()
-
-                if st_cols[1].button(
-                    t("Cancel"),
-                    type="secondary",
-                    key=f"single_cancel_{col['key']}_{st.session_state.single_key}",
-                    use_container_width=True,
-                ):
-                    st.session_state[editing_key] = None
-                    st.rerun()
-
-            else:
-                if value:
-                    st.markdown(value)
-                else:
-                    st.caption(f"_{t('No content.')}_")
-
-                if st.button(
-                    t("Edit content"), type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"
-                ):
-                    st.session_state[editing_key] = value
-                    st.rerun()
-
-        elif col["type"] == "tags":
-            value = entry.get(col["key"], []) or []
-
-            options = set(value)
-            for _entry in entries_table.all():
-                options = options.union(_entry.get(col["key"], []) or [])
-
-            updated_value = st.multiselect(
-                col["label"],
-                sorted(options),
-                default=value,
-                accept_new_options=True,
-                placeholder=t("Add tags"),
-                key=f"single_{col['key']}_{st.session_state.single_key}",
-            )
-            if value != updated_value:
-                st.info(t("unsaved_changes_info"), icon="ℹ️")
-                needs_validation = True
-
-        updated_entry[col["key"]] = updated_value
+    if needs_validation:
+        st.info(t("unsaved_changes_info"), icon="ℹ️")
 
     return updated_entry, needs_validation
 

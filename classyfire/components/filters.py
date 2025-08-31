@@ -11,22 +11,26 @@ filters_exclude: list[str] = []
 
 def filter_entries(entries: list[Document]) -> list[Document]:
     for filter in filters_include:
-        if ":" in filter:
-            key, value = filter.split(":", 1)
+        if "|" in filter:
+            key, value = filter.split("|", 1)
             if key in [col["key"] for col in columns_table.all()]:
                 entries = [
-                    entry for entry in entries if value.lower() in [tag.lower() for tag in entry.get(key, []) or []]
+                    entry
+                    for entry in entries
+                    if value.lower() in [tag.lower().split(":")[0] for tag in entry.get(key, []) or []]
                 ]
                 continue
 
         entries = [entry for entry in entries if any(filter.lower() in str(v).lower() for v in entry.values())]
 
     for filters in filters_exclude:
-        if ":" in filters:
-            key, value = filters.split(":", 1)
+        if "|" in filters:
+            key, value = filters.split("|", 1)
             if key in [col["key"] for col in columns_table.all()]:
                 entries = [
-                    entry for entry in entries if value.lower() not in [tag.lower() for tag in entry.get(key, []) or []]
+                    entry
+                    for entry in entries
+                    if value.lower() not in [tag.lower().split(":")[0] for tag in entry.get(key, []) or []]
                 ]
                 continue
 

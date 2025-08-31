@@ -70,6 +70,7 @@ def main() -> None:
     filtered_entries = sort_entries(filter_entries(entries))
     st.write(f"_{t('Showing')} {len(filtered_entries)} {t('of')} {len(entries)} {t('entries')}._")
     st.caption(t("table_caption"))
+    st.caption(t("tag_format_caption"))
 
     if len(filters_include) > 0:
         st.info(t("clear_filters_info"))
@@ -86,7 +87,6 @@ def main() -> None:
         doc_id = entry.doc_id
         entry = dict(entry)
         entry["view"] = f"?doc_id={doc_id}"
-        entry["doc_id"] = doc_id
         filtered_entries_with_view.append(entry)
 
     column_config = {
@@ -115,15 +115,17 @@ def main() -> None:
     for entry in updated_entries:
         if "view" in entry:
             del entry["view"]
-        if "doc_id" in entry:
-            del entry["doc_id"]
 
         for col in columns_table.all():
-            if entry.get(col["key"]) is None:
+            value = entry.get(col["key"])
+
+            if value is None:
                 if col["type"] == "tags":
-                    entry[col["key"]] = []
+                    value = []
                 else:
-                    entry[col["key"]] = ""
+                    value = ""
+
+            entry[col["key"]] = value
 
     def discard_callback() -> None:
         st.session_state.table_key += 1

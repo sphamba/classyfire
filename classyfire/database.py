@@ -63,25 +63,25 @@ def init_entries() -> None:
     if len(entries_table.all()) == 0:
         entries_table.insert_multiple([
             {
-                "reference": "Doe et al. (2023)",
+                "reference": "Doe et al., 2023",
                 "theme": t("Sample theme"),
                 "results": t("Sample results"),
                 "highlights": t("Sample highlights"),
                 "criticisms": t("Sample criticisms"),
                 "authors": ["John Doe", "Jane Smith"],
-                "definitions": [f"{t('definition')}1", f"{t('definition')}2"],
+                "definitions": [f"{t('definition')}1:42", f"{t('definition')}2"],
                 "concepts": [f"{t('concept')}1", f"{t('concept')}2"],
                 "tools": [f"{t('tool')}1", f"{t('tool')}2"],
             },
             {
-                "reference": "Johnson et al. (2024)",
+                "reference": "Johnson et al., 2024",
                 "theme": t("Another theme"),
                 "results": t("Another results"),
                 "highlights": t("Another highlights"),
                 "criticisms": t("Another criticisms"),
                 "authors": ["Alice Johnson", "Bob Brown"],
                 "definitions": [f"{t('definition')}3", f"{t('definition')}4"],
-                "concepts": [f"{t('concept')}3", f"{t('concept')}4"],
+                "concepts": [f"{t('concept')}3", f"{t('concept')}4:29-31"],
                 "tools": [f"{t('tool')}3", f"{t('tool')}4"],
             },
         ])
@@ -96,8 +96,8 @@ def get_filters_options() -> list[str]:
 
         for entry in entries_table.all():
             tags = entry.get(col["key"], []) or []
-            tags = [tag.lower() for tag in tags]
-            prefixed_tags = [f"{col['key']}:{tag}" for tag in tags]
+            tags = [tag.lower().split(":")[0] for tag in tags]  # remove page numbers
+            prefixed_tags = [f"{col['key']}|{tag}" for tag in tags]  # add tag-type prefix
             options.update(tags)
             options.update(prefixed_tags)
 
