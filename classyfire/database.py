@@ -143,7 +143,7 @@ def update_database(
 
 
 def add_new_entry() -> Document:
-    new_entry = {col["key"]: None for col in columns_table.all()}
+    new_entry = {col["key"]: [] if col["type"] == "tags" else "" for col in columns_table.all()}
     id = entries_table.insert(new_entry)
     return entries_table.get(doc_id=id)
 

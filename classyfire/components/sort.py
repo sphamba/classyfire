@@ -31,6 +31,7 @@ def main() -> None:
     global method
 
     st.header(f"🔀 {t('Sort')}")
+    st.caption(t("sort_caption"))
 
     options = {
         t("Last modified"): "modified",

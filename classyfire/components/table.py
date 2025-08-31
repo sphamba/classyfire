@@ -2,7 +2,7 @@ import streamlit as st
 
 from .filters import filter_entries, filters_include, filters_exclude
 from .sort import sort_entries
-from ..database import columns_table, entries_table, update_database
+from ..database import columns_table, entries_table, update_database, add_new_entry
 from ..i18n import t
 
 
@@ -71,6 +71,16 @@ def main() -> None:
     st.write(f"_{t('Showing')} {len(filtered_entries)} {t('of')} {len(entries)} {t('entries')}._")
     st.caption(t("table_caption"))
 
+    if len(filters_include) > 0:
+        st.info(t("clear_filters_info"))
+    else:
+        if st.button(
+            t("Add new entry"), type="primary", key=f"table_add_{st.session_state.table_key}", use_container_width=True
+        ):
+            add_new_entry()
+            st.session_state.table_key += 1
+            st.rerun()
+
     filtered_entries_with_view = []
     for entry in filtered_entries:
         doc_id = entry.doc_id
@@ -79,7 +89,10 @@ def main() -> None:
         entry["doc_id"] = doc_id
         filtered_entries_with_view.append(entry)
 
-    column_config = {col["key"]: col["label"] for col in columns_table.all()}
+    column_config = {
+        col["key"]: st.column_config.ListColumn(col["label"]) if col["type"] == "tag" else col["label"]
+        for col in columns_table.all()
+    }
     column_config.update({
         "view": st.column_config.LinkColumn(
             "",
@@ -105,8 +118,12 @@ def main() -> None:
         if "doc_id" in entry:
             del entry["doc_id"]
 
-    if len(filters_include) > 0:
-        st.info(t("clear_filters_info"))
+        for col in columns_table.all():
+            if entry.get(col["key"]) is None:
+                if col["type"] == "tags":
+                    entry[col["key"]] = []
+                else:
+                    entry[col["key"]] = ""
 
     def discard_callback() -> None:
         st.session_state.table_key += 1
