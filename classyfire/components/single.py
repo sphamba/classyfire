@@ -138,7 +138,7 @@ def get_entry_with_updated_text(entry: dict, col: dict) -> dict:
 
         if st.session_state[editing_key] is not None:
             temporary_value = st.text_area(
-                "",
+                t("Edit content"),
                 value=st.session_state[editing_key],
                 height=300,
                 placeholder=t("Type Markdown here"),
