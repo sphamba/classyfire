@@ -242,7 +242,7 @@ def get_updated_entry(entry: Document, print_mode: bool = False) -> tuple[dict, 
     if print_mode:
         reference = entry.get("reference", "")
         st.markdown(
-            f"# {reference}" if reference else f"# <span style='color:{LIGHT_GREY}'>_{t('No reference')}_</span>",
+            f"## {reference}" if reference else f"## <span style='color:{LIGHT_GREY}'>_{t('No reference')}_</span>",
             unsafe_allow_html=True,
         )
 
