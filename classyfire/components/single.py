@@ -9,6 +9,9 @@ from ..database import columns_table, entries_table, update_database, add_new_en
 from ..i18n import t
 
 
+LIGHT_GREY = "#83858c"
+
+
 def create_new_entry() -> None:
     new_entry = add_new_entry()
     st.session_state.single_entry_doc_index = new_entry.doc_id
@@ -173,7 +176,7 @@ def get_entry_with_updated_text(entry: dict, col: dict, print_mode: bool = False
             if value:
                 st.markdown(value)
             else:
-                st.caption(f"_{t('No content.')}_")
+                st.caption(f"_{t('No content')}_")
 
             if not print_mode and st.button(
                 t("Edit content"), type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"
@@ -205,7 +208,12 @@ def get_entry_with_updated_tags(entry: dict, col: dict, print_mode: bool = False
         updated_value = value
         st.markdown(
             f"**{col['label']}**: "
-            + ("".join([f":red-badge[{tag}]" for tag in value]) if value else f"_{t('No tags')}_")
+            + (
+                "".join([f":red-badge[{tag}]" for tag in value])
+                if value
+                else f"<span style='color:{LIGHT_GREY}'>_:small[{t('No tags')}]_</span>"
+            ),
+            unsafe_allow_html=True,
         )
     else:
         updated_value = st.multiselect(
@@ -232,7 +240,11 @@ def get_updated_entry(entry: Document, print_mode: bool = False) -> tuple[dict, 
         del st.session_state.must_notify_single_saved
 
     if print_mode:
-        st.header(entry.get("reference") or f"_{t('no reference')}_")
+        reference = entry.get("reference", "")
+        st.markdown(
+            f"# {reference}" if reference else f"# <span style='color:{LIGHT_GREY}'>_{t('No reference')}_</span>",
+            unsafe_allow_html=True,
+        )
 
     for col in columns_table.all():
         updated_entry = get_entry_with_updated_text(updated_entry, col, print_mode=print_mode)
