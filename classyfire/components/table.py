@@ -38,7 +38,7 @@ def get_columns_visibility() -> dict[str, bool]:
     ]
     st_cols = st.columns(len(options))
     for i, option in enumerate(options):
-        if st_cols[i].button(option["label"], type=option["button_type"], use_container_width=True):
+        if st_cols[i].button(option["label"], type=option["button_type"], width="stretch"):
             columns_visibility = {col["key"]: col["key"] in option["columns"] for col in columns_table.all()}
             st.session_state.columns_visibility = columns_visibility
             st.session_state.columns_visibility_key += 1
@@ -76,7 +76,7 @@ def main() -> None:
         st.info(t("clear_filters_info"))
     else:
         if st.button(
-            t("Add new entry"), type="primary", key=f"table_add_{st.session_state.table_key}", use_container_width=True
+            t("Add new entry"), type="primary", key=f"table_add_{st.session_state.table_key}", width="stretch"
         ):
             add_new_entry()
             st.session_state.table_key += 1

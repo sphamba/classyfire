@@ -24,7 +24,7 @@ def entry_selection(entries: list[Document]) -> Document | None:
 
     if len(filtered_entries) == 0:
         st.info(t("no_entries_match_info"), icon="ℹ️")
-        if st.button(t("Add new entry"), type="primary", use_container_width=True):
+        if st.button(t("Add new entry"), type="primary", width="stretch"):
             create_new_entry()
         return None
 
@@ -62,19 +62,19 @@ def entry_selection(entries: list[Document]) -> Document | None:
             f"{t('Reference')}: {filtered_entries[entry_index].get('reference', f'_{t("not set")}_') or f'_{t("not set")}_'}"
         )
         st_cols = st.columns(2)
-        if st_cols[0].button(t("Delete"), type="primary", use_container_width=True):
+        if st_cols[0].button(t("Delete"), type="primary", width="stretch"):
             delete_entry(filtered_entries[entry_index])
-        if st_cols[1].button(t("Cancel"), type="secondary", use_container_width=True):
+        if st_cols[1].button(t("Cancel"), type="secondary", width="stretch"):
             st.rerun()
 
-    if st_cols[1].button(t("Delete entry"), type="tertiary", use_container_width=True):
+    if st_cols[1].button(t("Delete entry"), type="tertiary", width="stretch"):
         confirm_delete()
 
     st_cols = st.columns([0.2, 0.6, 0.2])
 
     if st_cols[0].button(
         t("Previous"),
-        use_container_width=True,
+        width="stretch",
         type="secondary",
         disabled=entry_index == 0,
     ):
@@ -85,14 +85,14 @@ def entry_selection(entries: list[Document]) -> Document | None:
 
     if st_cols[1].button(
         t("Add new entry"),
-        use_container_width=True,
+        width="stretch",
         type="primary",
     ):
         create_new_entry()
 
     if st_cols[2].button(
         t("Next"),
-        use_container_width=True,
+        width="stretch",
         type="secondary",
         disabled=entry_index == len(filtered_entries) - 1,
     ):
@@ -108,8 +108,8 @@ def entry_selection(entries: list[Document]) -> Document | None:
     return entry
 
 
-def get_entry_with_updated_text(entry: dict, col: dict) -> dict:
-    if col["type"] == "tags":
+def get_entry_with_updated_text(entry: dict, col: dict, print_mode: bool = False) -> dict:
+    if col["type"] == "tags" or print_mode and col["key"] == "reference":
         return entry
 
     updated_entry = entry.copy()
@@ -151,7 +151,7 @@ def get_entry_with_updated_text(entry: dict, col: dict) -> dict:
                 t("Save"),
                 type="primary",
                 key=f"single_save_{col['key']}_{st.session_state.single_key}",
-                use_container_width=True,
+                width="stretch",
             ):
                 updated_value = temporary_value
                 st.session_state[editing_key] = None
@@ -164,7 +164,7 @@ def get_entry_with_updated_text(entry: dict, col: dict) -> dict:
                 t("Cancel"),
                 type="secondary",
                 key=f"single_cancel_{col['key']}_{st.session_state.single_key}",
-                use_container_width=True,
+                width="stretch",
             ):
                 st.session_state[editing_key] = None
                 st.rerun()
@@ -175,7 +175,9 @@ def get_entry_with_updated_text(entry: dict, col: dict) -> dict:
             else:
                 st.caption(f"_{t('No content.')}_")
 
-            if st.button(t("Edit content"), type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"):
+            if not print_mode and st.button(
+                t("Edit content"), type="secondary", key=f"edit_{col['key']}_{st.session_state.single_key}"
+            ):
                 st.session_state[editing_key] = value
                 st.rerun()
 
@@ -183,7 +185,7 @@ def get_entry_with_updated_text(entry: dict, col: dict) -> dict:
     return updated_entry
 
 
-def get_entry_with_updated_tags(entry: dict, col: dict) -> tuple[dict, bool]:
+def get_entry_with_updated_tags(entry: dict, col: dict, print_mode: bool = False) -> tuple[dict, bool]:
     if col["type"] != "tags":
         return entry, False
 
@@ -199,14 +201,21 @@ def get_entry_with_updated_tags(entry: dict, col: dict) -> tuple[dict, bool]:
         if ":" in tag:
             options.remove(tag.split(":")[0])
 
-    updated_value = st.multiselect(
-        col["label"],
-        sorted(options),
-        default=value,
-        accept_new_options=True,
-        placeholder=t("Add tags"),
-        key=f"single_{col['key']}_{st.session_state.single_key}",
-    )
+    if print_mode:
+        updated_value = value
+        st.markdown(
+            f"**{col['label']}**: "
+            + ("".join([f":red-badge[{tag}]" for tag in value]) if value else f"_{t('No tags')}_")
+        )
+    else:
+        updated_value = st.multiselect(
+            col["label"],
+            sorted(options),
+            default=value,
+            accept_new_options=True,
+            placeholder=t("Add tags"),
+            key=f"single_{col['key']}_{st.session_state.single_key}",
+        )
     if value != updated_value:
         needs_validation = True
 
@@ -214,7 +223,7 @@ def get_entry_with_updated_tags(entry: dict, col: dict) -> tuple[dict, bool]:
     return updated_entry, needs_validation
 
 
-def get_updated_entry(entry: Document) -> tuple[dict, bool]:
+def get_updated_entry(entry: Document, print_mode: bool = False) -> tuple[dict, bool]:
     updated_entry = dict(entry)
     needs_validation = False
 
@@ -222,14 +231,18 @@ def get_updated_entry(entry: Document) -> tuple[dict, bool]:
         st.toast(t("Changes saved."), icon="ℹ️")
         del st.session_state.must_notify_single_saved
 
+    if print_mode:
+        st.header(entry.get("reference") or f"_{t('no reference')}_")
+
     for col in columns_table.all():
-        updated_entry = get_entry_with_updated_text(updated_entry, col)
+        updated_entry = get_entry_with_updated_text(updated_entry, col, print_mode=print_mode)
 
     st.write(f"#### 🏷️ {t('Tags')}")
-    st.caption(t("tag_format_caption"))
+    if not print_mode:
+        st.caption(t("tag_format_caption"))
 
     for col in columns_table.all():
-        updated_entry, col_needs_validation = get_entry_with_updated_tags(updated_entry, col)
+        updated_entry, col_needs_validation = get_entry_with_updated_tags(updated_entry, col, print_mode=print_mode)
         needs_validation = needs_validation or col_needs_validation
 
     if needs_validation:
@@ -270,23 +283,37 @@ def write_pages_summary(entry: dict) -> None:
     st.markdown("\n".join(pages_info_list))
 
 
-def main() -> None:
+def main(print_mode: bool = False) -> None:
     if "single_key" not in st.session_state:
         st.session_state.single_key = 0
 
     entries = entries_table.all()
-    entry = entry_selection(entries)
 
-    st.divider()
+    with st.empty() if print_mode else st.container():
+        entry = entry_selection(entries)
+        st.divider()
+
+        if print_mode:
+            st.empty()
 
     if entry is None:
         st.info(t("No entry selected."), icon="ℹ️")
         return
 
-    st.subheader(f"📝 {t('Notes')}")
+    if not print_mode:
+        st_cols = st.columns([0.8, 0.2], vertical_alignment="center")
+        st_cols[0].subheader(f"📝 {t('Notes')}")
+        st_cols[1].link_button(
+            f"🖨️ {t('Print')}",
+            f"?doc_id={entry.doc_id}&print=1",
+            width="stretch",
+        )
 
-    updated_entry, needs_validation = get_updated_entry(entry)
+    updated_entry, needs_validation = get_updated_entry(entry, print_mode=print_mode)
     write_pages_summary(updated_entry)
+
+    if print_mode:
+        return
 
     st.divider()
 

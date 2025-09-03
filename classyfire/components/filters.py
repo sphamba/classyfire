@@ -76,5 +76,5 @@ def main() -> None:
             if key not in [col["key"] for col in columns_table.all()]:
                 st.warning(f'{t("invalid_tag_type_1")}"`{key}:`"{t("invalid_tag_type_2")}')
 
-    if st.button(t("Clear filters"), type="secondary", use_container_width=True):
+    if st.button(t("Clear filters"), type="secondary", width="stretch"):
         clear_filters()
