@@ -140,6 +140,7 @@ def get_entry_with_updated_text(entry: dict, col: dict, print_mode: bool = False
             st.session_state[editing_key] = None
 
         if st.session_state[editing_key] is not None:
+            st.caption(t("available_formatting_options"))
             temporary_value = st.text_area(
                 t("Edit content"),
                 value=st.session_state[editing_key],
