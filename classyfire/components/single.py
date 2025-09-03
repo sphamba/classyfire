@@ -35,7 +35,7 @@ def entry_selection(entries: list[Document]) -> Document | None:
 
     if "single_entry_doc_index" not in st.session_state:
         if "doc_id" in st.query_params:
-            st.session_state.single_entry_doc_index = int(st.query_params["doc_id"][0])
+            st.session_state.single_entry_doc_index = int(st.query_params["doc_id"])
         else:
             st.session_state.single_entry_doc_index = filtered_entries[0].doc_id
     if "single_entry_index_key" not in st.session_state:
