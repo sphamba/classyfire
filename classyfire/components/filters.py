@@ -50,7 +50,10 @@ def main() -> None:
         st.session_state.filters_key = 0
 
     st.header(f"🧩 {t('Filters')}")
-    st.caption(t("filters_caption"))
+    st.caption(
+        t("filters_caption")
+        + ", ".join([f":blue-badge[{col['key']}|]" for col in columns_table.all() if col["type"] == "tags"])
+    )
 
     filters_options = get_filters_options()
 
